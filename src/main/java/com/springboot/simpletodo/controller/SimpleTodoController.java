@@ -26,8 +26,8 @@ public class SimpleTodoController {
 	}
 	
 	@PostMapping("/todo/insert")
-	public boolean insertTodo(String icon, String title) {
-		return std.insertTodo(icon, title) == 0 ? false : true;
+	public int insertTodo(String icon, String title) {
+		return std.insertTodo(icon, title);
 	}
 	
 	@PostMapping("/todo/update")
