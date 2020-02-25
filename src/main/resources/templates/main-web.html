@@ -1,69 +1,181 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
 <head>
-<meta charset="UTF-8">
-<title>Document</title>
-<link rel="stylesheet"
-	th:href="@{/webjars/bootstrap/4.4.1-1/css/bootstrap.css}">
+    <meta charset="UTF-8">
+    <title>Todo Web</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.4.1-1/css/bootstrap.css}">
 </head>
+
 <body>
-	<div class="container">
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th scope="col">id</th>
-					<th scope="col">icon</th>
-					<th scope="col">title</th>
-					<th scope="col">detail</th>
-					<th scope="col">reg_date</th>
-					<th scope="col">mod_date</th>
-					<th scope="col">
-						<button type="button" class="btn btn-primary">insert</button>
-					</th>
-				</tr>
-			</thead>
-			
-			<tbody id="table-body">
-			</tbody>
-		</table>
-	</div>
-	
-	<script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
-	<script th:src="@{/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js}"></script>
-	<script>
-		$.get("./todo/get", function(res){
-			console.log(res)
-			for(var i in res){
-				var trStr = "<tr>"
-				trStr += "<td>" + res[i].id + "</td>"
-				trStr += "<td>" + res[i].icon + "</td>"
-				trStr += "<td>" + res[i].title + "</td>"
-				trStr += "<td>" + res[i].detail + "</td>"
-				trStr += "<td>" + res[i].regDate + "</td>"
-				trStr += "<td>" + res[i].modDate + "</td>"
-				trStr += "<td>" 
-				+ '<button type="button" class="btn btn-warning btn-sm">modify</button>'
-				+ '<button type="button" class="btn btn-danger btn-sm btn-delete" data-id="' + res[i].id + '">delete</button>'
-				+ "</td>"
-				trStr += "</tr>"
-				$("#table-body").append(trStr)
-			}
-		})
-		
-		$("#table-body").on("click", ".btn-delete", function(e){
-			$.post("./todo/delete", {
-				id: $(e.target).data("id")
-			}, function(res){
-				if(res != 0) {
-					alert("success")
-					$(e.target).closest("tr").remove()
-				} else {
-					alert("failure")
-				}
-			})
-		})
-	</script>
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">icon</th>
+                    <th scope="col">title</th>
+                    <th scope="col">detail</th>
+                    <th scope="col">reg_date</th>
+                    <th scope="col">mod_date</th>
+                    <th scope="col">
+                        <button type="button" class="btn btn-primary" id="btn-insert">insert</button>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody id="table-body">
+            </tbody>
+        </table>
+
+
+        <div id="modal-form" class="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">insert</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    	<input type="hidden" id="input-id">
+                        <div class="form-group">
+                            <label for="icon-select">icon select</label>
+                            <select class="form-control" id="select-icon">
+                                <option selected>clock</option>
+                                <option>pencil</option>
+                                <option>note</option>
+                            </select>
+                            <div class="form-group">
+                                <label for="input-title">Title</label>
+                                <input type="text" class="form-control" id="input-title" placeholder="Enter title">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-title">Detail</label>
+                                <input type="text" class="form-control" id="input-detail" placeholder="Enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-submit" data-mode="insert">Add to Todo</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js}"></script>
+    <script>
+        function init(){
+        	$.get("./todo/get", function(res) {
+                console.log(res)
+                for (var i in res) {
+                    var trStr = "<tr>"
+                    trStr += "<td class='todo-id'>" + res[i].id + "</td>"
+                    trStr += "<td class='todo-icon'>" + res[i].icon + "</td>"
+                    trStr += "<td class='todo-title'>" + res[i].title + "</td>"
+                    trStr += "<td class='todo-detail'>" + res[i].detail + "</td>"
+                    trStr += "<td class='todo-reg-date'>" + res[i].regDate + "</td>"
+                    trStr += "<td class='todo-mod-date'>" + res[i].modDate + "</td>"
+                    trStr += "<td>" +
+                        '<button type="button" class="btn btn-warning btn-sm btn-modify">modify</button>' +
+                        '<button type="button" class="btn btn-danger btn-sm btn-delete" data-id="' + res[i].id + '">delete</button>' +
+                        "</td>"
+                    trStr += "</tr>"
+                    $("#table-body").append(trStr)
+                }
+            })
+        }
+        
+        init()
+
+        $("#table-body").on("click", ".btn-delete", function(e) {
+            $.post("./todo/delete", {
+                id: $(e.target).data("id")
+            }, function(res) {
+                if (res != 0) {
+                    alert("success")
+                    $(e.target).closest("tr").remove()
+                } else {
+                    alert("failure")
+                }
+            })
+        })
+        
+        $("#btn-insert").on("click", function(e) {
+        	$("#select-icon").val("clock")
+        	$("#input-title").val("")
+        	$("#input-detail").val("")
+        	$("#modal-form .modal-title").text("insert")
+        	$("#btn-submit").data("mode", "insert").text("Add to Todo")
+            $("#modal-form").modal("show")
+        })
+        
+        $("#table-body").on("click", ".btn-modify" , function(e) {
+        	
+        	var tr = $(e.target).closest("tr")
+        	var id = tr.find(".todo-id").text()
+        	var icon = tr.find(".todo-icon").text()
+        	var title = tr.find(".todo-title").text()
+        	var detail = tr.find(".todo-detail").text()
+        	
+        	$("#input-id").val(id)
+        	$("#select-icon").val(icon)
+        	$("#input-title").val(title)
+        	$("#input-detail").val(detail)
+        	$("#modal-form .modal-title").text("update")
+        	$("#btn-submit").data("mode", "update").text("Save the changes")
+            $("#modal-form").modal("show")
+        })
+        
+        $("#btn-submit").on("click", function(e) {
+        	
+
+            var selectVal = $("#select-icon").val()
+            var title = $("#input-title").val()
+            var detail = $("#input-detail").val()
+        	
+        	if(selectVal == '' || title == '' || detail == ''){
+        		alert("Please input all fields.")
+        		return
+        	}
+        	
+        	
+            if($(e.target).data("mode") == "insert") {
+                
+                $.post("./todo/insert", {
+                	icon: selectVal,
+                	title: title,
+                	detail: detail
+                }, function(res){
+                	if(res != 0){
+                		alert("insert success")
+                		$("#modal-form").modal("hide")	
+                		$("#table-body").html("")
+                		init()
+                	}
+                })
+            } else if ($(e.target).data("mode") == "update"){
+                $.post("./todo/update", {
+                	id: $("#input-id").val(),
+                	icon: selectVal,
+                	title: title,
+                	detail: detail
+                }, function(res){
+                	if(res != 0){
+                		alert("update success")
+                		$("#modal-form").modal("hide")	
+                		$("#table-body").html("")
+                		init()
+                	}
+                })
+            }
+        })
+
+    </script>
 </body>
+
 </html>
