@@ -5,6 +5,12 @@ public class Todo {
 	private int id;
 	private String icon, title, detail, regDate, modDate;
 	
+	
+	
+	public Todo() {
+		super();
+	}
+
 	public Todo(int id, String icon, String title, String detail, String regDate, String modDate) {
 		super();
 		this.id = id;

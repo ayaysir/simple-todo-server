@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/4.4.1-1/css/bootstrap.css}">
+</head>
+<body>
+	<div class="container">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th scope="col">id</th>
+					<th scope="col">icon</th>
+					<th scope="col">title</th>
+					<th scope="col">detail</th>
+					<th scope="col">reg_date</th>
+					<th scope="col">mod_date</th>
+					<th scope="col">
+						<button type="button" class="btn btn-primary">insert</button>
+					</th>
+				</tr>
+			</thead>
+			
+			<tbody id="table-body">
+			</tbody>
+		</table>
+	</div>
+	
+	<script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js}"></script>
+	<script>
+		$.get("./todo/get", function(res){
+			console.log(res)
+			for(var i in res){
+				var trStr = "<tr>"
+				trStr += "<td>" + res[i].id + "</td>"
+				trStr += "<td>" + res[i].icon + "</td>"
+				trStr += "<td>" + res[i].title + "</td>"
+				trStr += "<td>" + res[i].detail + "</td>"
+				trStr += "<td>" + res[i].regDate + "</td>"
+				trStr += "<td>" + res[i].modDate + "</td>"
+				trStr += "<td>" 
+				+ '<button type="button" class="btn btn-warning btn-sm">modify</button>'
+				+ '<button type="button" class="btn btn-danger btn-sm btn-delete" data-id="' + res[i].id + '">delete</button>'
+				+ "</td>"
+				trStr += "</tr>"
+				$("#table-body").append(trStr)
+			}
+		})
+		
+		$("#table-body").on("click", ".btn-delete", function(e){
+			$.post("./todo/delete", {
+				id: $(e.target).data("id")
+			}, function(res){
+				if(res != 0) {
+					alert("success")
+					$(e.target).closest("tr").remove()
+				} else {
+					alert("failure")
+				}
+			})
+		})
+	</script>
+</body>
+</html>
